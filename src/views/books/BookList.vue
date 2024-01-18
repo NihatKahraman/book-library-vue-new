@@ -18,13 +18,13 @@
 import { onMounted, ref } from 'vue';
 import axios from 'axios'
 
-const booksCollection = ref([])
+const bookCollection = ref([])
 
 
 onMounted(() => {
-    axios.get("https://localhost:7227")
+    axios.get("https://localhost:7227/api/books?PageNumber=1&PageSize=3")
     .then((response) => {
-        booksCollection.value = response.data;
+        bookCollection.value = response.data;
     })
 })
 </script>
