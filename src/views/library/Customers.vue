@@ -1,49 +1,54 @@
 <template>
-  <div class="books">
-   <div class="fields" style="text-align: left;">
-           <form class="form1">
+  <div class="customers">
+   <div class="firstRow" style="text-align: left;">
+           <form class="form-group">
              <div class="firstField">
+              <div style="margin-bottom: 15px; padding-left: 10px;">
+                  <button type="button" class="btn btn-primary" id="search">Search</button>
+                  <button type="button" class="btn btn-primary" id="add" @click="addCustomer">Add</button>
+                </div>
               <label for="Name">
-                    Name <input type="text" name="Name" id="name" style="margin-left: 10px;" required v-model="name">
+                    Name <input type="text" class="form-control" name="Name" id="name" required v-model="name">
                 </label>
-                <label for="Surname">
-                    Surname <input type="text" name="Surname" id="surname" required v-model="surname">
+                <label for="Gender">Gender
+                  <select name="gender" id="gender" class="form-select" style="cursor: pointer;" required v-model="selectedGender">
+                      <option v-for="gender in genders" :key="gender" style="cursor: pointer;">{{ gender }}</option>
+                  </select>
                 </label>
                <div class="secondField">
-                <label for="Gender">Gender</label>
-                <select name="gender" id="gender" style="cursor: pointer;" required v-model="selectedGender">
-                    <option v-for="gender in genders" :key="gender" style="cursor: pointer;">{{ gender }}</option>
-                </select>
                 <label for="Phone Number">
-                    Phone Number <input type="number" name="PhoneNumber" id="phoneNumber" style="width: 110px;" maxlength="10" required v-model="phoneNumber">
+                    Phone Number <input type="number" class="form-control" name="PhoneNumber" id="phoneNumber" style="width: 110px;" maxlength="10" required v-model="phoneNumber">
                 </label>
                 <label for="Age">
-                    Age <input type="number" name="number" id="number" maxlength="3" required v-model="age">
+                    Age <input type="number" class="form-control" name="number" id="number" maxlength="3" required v-model="age">
                 </label>
                </div>
              </div>
            </form>
        </div>
-       <div class="table">
+       <div class="secondRow">
         <table class="table table-dark table-striped"> 
           <thead>
               <tr>
                   <th id="th1" style="margin:0px; height: 20px; width: 20px;"></th>
                   <th>Name</th>
-                  <th>Surname</th>
                   <th>Gender</th>
                   <th>Phone Number</th>
                   <th>Age</th>
+                  <th style="width: 30px;"></th>
               </tr>
           </thead>
               <tbody>
-                  <tr v-for="(row, index) in paginatedTableRows" :key="index">
+                  <tr v-for="(row, index) in tableRows" :key="index">
                       <td><input id="cb1" type="checkbox" v-model="row.selected" @change="getSelectedRowData(row)" style="margin:0px; height: 20px; width: 20px;"  /></td>
                       <td>{{row.name}}</td>
-                      <td>{{row.surname}}</td>
                       <td>{{row.gender}}</td>
                       <td>{{row.phoneNumber}}</td>
                       <td>{{row.age}}</td>
+                      <td>
+                        <button @click="updateCustomer" type="button" class="btn btn-secondary"><i style="height: 15px; widows: 15px;" class="bi bi-pencil"></i></button>
+                        <button @click="deleteCustomer" type="button" class="btn btn-danger"><i style="height: 15px; widows: 15px;" class="bi bi-trash3"></i></button>
+                      </td>
                   </tr>
               </tbody>
         </table>
@@ -58,88 +63,210 @@ import axios from 'axios'
 export default {
   setup() {
     const customers = ref([])
-
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWRtaW4iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImV4cCI6MTcwNTkzMTk3NiwiaXNzIjoiYnNzdG9yZWFwaSIsImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3Q6MzAwMCJ9.EnE7zZt-R2yXfwpFCPgMiHhyABdCMk0t5I3SkXKmlxw';
+    
     const router = useRouter()
     const name = ref("");
-    const surname = ref("");
     const genders = ref(["Female", "Male"]);
     const selectedGender = ref("");
     const phoneNumber = ref("");
     const age = ref("");
     const tableRows = ref([]);
 
-
-    onMounted(() => {
-      axios.get('https://localhost:7227/api', { 
+    const aaaddCustomer = async () => {
+      const userToken = sessionStorage.getItem("userToken");
+      var postData = {
+        Name: name.value, 
+        Gender: selectedGender.value,
+        PhoneNumber: phoneNumber.value,
+        Age: age.value
+      };
+      console.log(postData);
+      let axiosConfig = {
         headers: {
-          'Authorization': 'Bearer' + token
-        } 
-      })
+          Authorization: 'Bearer ' + userToken
+        }
+      };
+
+      console.log(sessionStorage.getItem("userToken"));
+      
+      if(userToken) {
+        await axios.post('https://localhost:7227/api/customers', postData, axiosConfig)
       .then(response => {
-        customers.value = response.data
+        console.log('customer added:', response.data) 
+        // Update UI here...
       })
       .catch(error => {
-        router.push({name: "home"})
-  })
-    });
+        console.error('Error adding customer', error)
+      })
+    }
+  }
 
-    return {name, surname, genders, selectedGender, phoneNumber, age, customers }
+  const addCustomer = () => {
+        if(name.value && selectedGender.value && phoneNumber.value && age.value){
+        const newCustomer = {
+          name: name.value,
+          gender: selectedGender.value,
+          phoneNumber: phoneNumber.value,
+          age: age.value,
+        };
+        tableRows.value.push(newCustomer);
+        
+        } else {
+            alert('Please fill in all fields');
+        }
+        
+    };
+
+    const deleteCustomer = () => {
+	    const selectedRows = tableRows.value.filter(row => row.selected)
+	
+	if(selectedRows.length > 0) {
+		selectedRows.forEach(async (selectedRow) => {
+		
+		});
+		tableRows.value = tableRows.value.filter(row => !row.selected)
+
+   
+	} else { 
+	    alert('Select a customer that you want to delete!')
+	}
+};
+
+const updateCustomer = async () => {
+	const selectedRows = tableRows.value.filter(row => row.selected);
+	
+	if(selectedRows.length > 0) {
+		selectedRows.forEach(async (selectedRow) => {
+			const doc = await collectionRef.value.where('id', '==', selectedRow.id).limit(1).get();
+			doc.forEach(async (entry) => {
+				const docId = entry.id;
+				
+				await updateDoc(docId, {
+					name: name.value,
+          gender: selectedGender.value,
+          phoneNumber: phoneNumber.value,
+          age: age.value,
+				});
+				tableRows.value.forEach(row => {
+          if(row.selected) {
+              row.selected = false;
+          }
+        })
+               
+			});
+		});
+		
+		
+	} else {
+        alert('Select a customer that you want to update!')
+    }
+}
+
+  const getSelectedRowData = (selectedRow) => {
+          if(selectedRow.selected) {
+              name.value = selectedRow.name;
+              selectedGender.value = selectedRow.gender;
+              phoneNumber.value = selectedRow.phoneNumber;
+              age.value = selectedRow.age;
+          } else {
+              name.value = '';
+              selectedGender.value = '';
+              phoneNumber.value = '';
+              age.value = '';
+          }
+          
+      }
+
+      const getCustomers = async () => {
+        const userToken = sessionStorage.getItem("userToken");
+      var getData = {
+        Name: name.value, 
+        Gender: selectedGender.value,
+        PhoneNumber: phoneNumber.value,
+        Age: age.value
+      };
+      console.log(getData);
+      let axiosConfig = {
+        headers: {
+          Authorization: 'Bearer ' + userToken
+        }
+      };
+
+      console.log(sessionStorage.getItem("userToken"));
+      
+      if(userToken) {
+        await axios.get('https://localhost:7227/api/customers', getData, axiosConfig)
+      .then(response => {
+        console.log('customer added:', response.data) 
+        // Update UI here...
+      })
+      .catch(error => {
+        console.error('Error adding customer', error)
+      })
+    }
+      }
+
+    return {name, genders, selectedGender, phoneNumber, age, customers, tableRows, addCustomer, deleteCustomer, updateCustomer, getSelectedRowData }
   }
 }
 </script>
 
-<style>
-.books {
+<style scoped>
+.customers {
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 0.5fr 1.5fr;
-  gap: 0px 0px;
+  gap: 100px 0px;
   grid-template-areas: 
-    "fields"
-    "table";
+    "firstRow"
+    "secondRow";
 }
-.fields {
-  grid-area: fields;
-  
+.firstRow {
+  grid-area: firstRow;
 }
-.table {
-  grid-area: table;
-  
+.secondRow {
+  grid-area: secondRow;
 }
-input{
-  width: 120px; 
-  height: 10px;
-  text-align: left;
-}
-
 label {
-  margin-bottom: 20px;
+  color: #f5f4f4;
+  width: 150px;
+  padding: 10px;
 }
 select{
-    margin-top: 20px;
-    margin-bottom: 20px;
-    color: black;
+  color: black;
     
 }
 option{
   color: black;
 }
-.form1 {
-  height: 75px;
+.form-group {
+  height: 200px;
   width: 1000px;
   padding: 30px;
-  padding-top: 20px;
-  padding-bottom: 28px;
+  padding-left: 10px;
+ 
 }
-#gender {
+.form-select{ 
+    height: 20px;
+}
+input {
   height: 20px;
   width: 120px;
-  margin-left: 5px;
-  margin-right: 5px;
 }
-.buttons {
-  margin-top: 5px;
-  margin-left: 50px;
+
+#search {
+  font-size: 15px;
+  padding-bottom: 3px;
+}
+#add {
+  margin-left: 5px;
+  font-size: 15px;
+  padding-bottom: 3px;
+}
+table{
+  padding-left: 50px;
+}
+th{
+  width: 100px
 }
 </style>

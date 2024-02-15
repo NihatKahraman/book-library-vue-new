@@ -4,6 +4,7 @@ import axios from 'axios'
 
 const requireAuth = (to, from, next) => {
   const userToken = sessionStorage.getItem("userToken");
+  let isUserAuthenticated = sessionStorage.getItem("isUserAuthenticated");
   if(userToken) {
     axios.post('https://localhost:7227/api/authentication/authenticate', { 
     headers: {
@@ -18,7 +19,14 @@ const requireAuth = (to, from, next) => {
   .catch(error => {
     router.push({name: "login"})
   })
+  }else{
+    if(isUserAuthenticated){
+      next()
+    }else{
+      next({name: "login"})
+    }
   }
+  
   // this.$root.$emit("authentication", true)
 }
 

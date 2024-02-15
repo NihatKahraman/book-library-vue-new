@@ -22,17 +22,27 @@ export default{
   text-align: center;
   color: #2c3e50;
 }
-
+body{
+  background: rgb(30, 35, 40);
+}
 nav {
   padding: 30px;
 }
 
 nav a {
   font-weight: bold;
-  color: #2c3e50;
 }
 
 nav a.router-link-exact-active {
-  color: rgb(199, 215, 229);
+  color: rgb(147, 192, 231);
 }
+*{
+    margin: 0;
+    padding: 0;
+    font-family: 'Josefin Sans', sans-serif;
+    font-style: italic;
+    font-weight: 700;
+    color: var(--primary);
+}
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@1,400;1,500;1,600;1,700&display=swap');
 </style>

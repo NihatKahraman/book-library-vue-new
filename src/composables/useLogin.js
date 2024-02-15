@@ -14,6 +14,7 @@ const login = async (email, password) => {
         Password: password })
         .then(response => {
             sessionStorage.setItem("userToken", response.data.accessToken);
+            sessionStorage.setItem("isUserAuthenticated", true)
             console.log(sessionStorage.getItem("userToken"))
             console.log(sessionStorage.getItem("isUserAuthenticated"))
           })

@@ -2,16 +2,16 @@
     <div class="navbar">
         <nav>
             <router-link :to="{name: 'home'}"><img class="image" alt=""></router-link>
-            <h1 style="color: azure;"><router-link :to="{name: 'home'}">Book Library</router-link></h1>
+            <h1 id style="color: azure;"><router-link :to="{name: 'home'}">Book Library</router-link></h1>
             <div class="links">
                 <div v-if="isLoggedIn">
                     <span>Hi</span> 
-                    <router-link class="btn" :to="{name: 'about'}">About</router-link>
-                    <button @click="logoutButtonClick">Logout</button>
+                    <router-link style="color: aliceblue;" type="button" class="btn btn-primary" :to="{name: 'about'}">About</router-link>
+                    <button type="button" class="btn btn-primary" @click="logoutButtonClick">Logout</button>
                 </div>
                 <div v-else>
-                    <router-link class="btn" :to="{name: 'signup'}">Signup</router-link>
-                    <router-link class="btn" :to="{name: 'login'}">Login</router-link>
+                    <router-link type="button" class="btn btn-primary"  :to="{name: 'signup'}">Signup</router-link>
+                    <router-link type="button" class="btn btn-primary" :to="{name: 'login'}">Login</router-link>
                 </div>
             </div>
         </nav>
@@ -19,23 +19,24 @@
 </template>
 
 <script>
-import { ref} from 'vue'
+import { ref, reactive, computed } from 'vue'
 import useLogout from '@/composables/useLogout';
+import {isUserAuthenticated} from '@/composables/auth'
 import {useRouter} from 'vue-router';
-
+import { useStore } from "vuex";
 export default {
     setup() {
+
         const isLoggedIn = ref(sessionStorage.getItem("isUserAuthenticated"))
+        
         const { logout } = useLogout();
         const router = useRouter()
         
         const logoutButtonClick = async () => {
-            
             await logout();
-            isLoggedIn.value = false;
+            isLoggedIn.value = false
             console.log('user logged out')
             router.push({name: "login"})
-            
         }
         return { logoutButtonClick, isLoggedIn}
     }
@@ -45,7 +46,6 @@ export default {
 <style scoped>
 .navbar{
     padding: 16px 10px;
-    margin-bottom: 20px;
     
 }
 nav {
@@ -56,13 +56,12 @@ nav {
     
 }
 .navbar h1 {
-    
+    margin-right: 400px;
     text-decoration: none;
-    margin-left: 20px;
 }
 nav .links{
     text-decoration: none;
-    color: rgb(24, 20, 10);
+    color: rgb(14, 15, 15);
     margin-left: auto;
 }
 nav .links a,
@@ -75,11 +74,15 @@ nav img {
     max-height: 60px;
 }
 span {
+  color: rgb(147, 192, 231);
   font-size: 14px;
   display: inline-block;
   margin-right: 16px;
   padding-right: 16px;
   border-right: 1px solid #ccc;
 }
-
+a {
+    text-decoration: none;
+    color: rgb(147, 192, 231);
+}
 </style>

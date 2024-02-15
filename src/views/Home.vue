@@ -19,6 +19,11 @@ export default {
   const msg = "Welcome to the Book Library"
   const router = useRouter()
 
+  
+  const reloadPage = () => {
+      window.location.reload();
+    }
+
 onMounted(() => {
   axios.post('https://localhost:7227/api/authentication/authenticate', { 
     headers: {
@@ -41,7 +46,7 @@ onMounted(() => {
   display: block ;
   grid-template-columns: 1fr 1fr 1fr;
   grid-gap: 20px;
-  max-width: 300px;
+  max-width: 380px;
   margin: 60px auto;
   background: #343434;
   padding: 30px;
@@ -50,6 +55,16 @@ onMounted(() => {
   cursor: pointer;
   line-height: 1.5em;
   text-transform: capitalize;
-    
+  text-decoration: none; 
+}
+
+a {
+  text-decoration: none;
+}
+body{
+  background: rgb(30, 35, 40);
+}
+h3{
+  color: rgb(147, 192, 231);
 }
 </style>

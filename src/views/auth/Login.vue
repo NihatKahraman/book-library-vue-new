@@ -11,7 +11,7 @@
 
 <script>
 import useLogin from '@/composables/useLogin'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import {useRouter} from 'vue-router'
 
 export default {
@@ -21,6 +21,11 @@ export default {
     const email = ref('')
     const password = ref('')
     const router = useRouter()
+    let isLoggedIn = sessionStorage.getItem("isUserAuthenticated")
+
+    const reloadPage = () => {
+      window.location.reload();
+    }
     
 
     const handleSubmit = async () => {
@@ -35,6 +40,13 @@ export default {
         }
         
     }
+
+    onMounted(() => {
+        if(isLoggedIn){
+            router.push({ name: 'home'})
+        }
+        
+    })
     return{email, password, handleSubmit, error, isPending}
    }
 

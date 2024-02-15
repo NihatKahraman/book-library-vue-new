@@ -7,6 +7,7 @@ const logout = async () => {
     error.value = null;
     isPending.value = true;
     try {
+        sessionStorage.clear();
         isPending.value = false;
     } catch (error) {
         console.log(error.message)
